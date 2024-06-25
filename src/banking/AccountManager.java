@@ -13,6 +13,7 @@ import java.util.random.RandomGenerator.ArbitrarilyJumpableGenerator;
 
 public class AccountManager {
 
+	// AccountManager accountManager = new AccountManager();
 	// 계좌정보
 	Account accout;
 
@@ -47,7 +48,8 @@ public class AccountManager {
 		System.out.println("3.출금");
 		System.out.println("4.전체계좌정보출력");
 		System.out.println("5.계좌정보삭제");
-		System.out.println("6.프로그램종료");
+		System.out.println("6.저장옵션");
+		System.out.println("7.프로그램종료");
 	}
 
 	public void makeAccount() {
@@ -74,7 +76,7 @@ public class AccountManager {
 			System.out.println("잔액을 입력하세요");
 			int balance = scanner.nextInt();
 			scanner.nextLine();
-			
+
 			// 계좌번호 중복 체크
 //
 //			for (Account acc : accLists) {
@@ -95,12 +97,12 @@ public class AccountManager {
 //				System.out.println("기본이자 :" + ((NormalAccount) accout).getRate());
 //			}
 
-			Account accout = new NormalAccount(accountNumbe, name, balance, rate);
+			// Account accout = new NormalAccount(accountNumbe, name, balance, rate);
 			boolean chk = accLists.add(accout);
 			if (!chk) {
 				System.out.println("등록된 계좌정보입니다.기존의 정보를 삭제 후 재등록하시겠습니까? Y or N ");
 				String chkYn = scanner.nextLine();
-				if (chkYn.equals("Y")) {
+				if (chkYn.equalsIgnoreCase("Y")) {
 					delAccount2(accountNumbe);
 				}
 				accLists.add(accout);
@@ -132,7 +134,7 @@ public class AccountManager {
 			System.out.println("잔액을 입력하세요");
 			int balance = scanner.nextInt();
 			scanner.nextLine();
-			
+
 			// 계좌번호 중복 체크
 //			for (Account acc : accLists) {
 //				if (acc.getAccountNumber().equals(accountNumbe)) {
@@ -167,7 +169,7 @@ public class AccountManager {
 				System.out.println("기본이자 :" + ((HighCreditAccount) accout).getRate());
 				System.out.println("기본이자 :" + ((HighCreditAccount) accout).getRate());
 			}
-			
+
 		} else {
 			System.out.println("계좌 종류를 정확히 선택해 주세요");
 		}
@@ -337,6 +339,40 @@ public class AccountManager {
 		}
 	}
 
+	// 자동 저장
+	public AutoSaver autoSave(AutoSaver thread) {
+		Scanner scanner = new Scanner(System.in);
+	
+
+		System.out.println("저장옵션을 선택하세요");
+		System.out.println("1.자동저장On");
+		System.out.println("2.자동저장Off");
+		int autoSaveYn = scanner.nextInt();
+		scanner.nextLine();
+		if (autoSaveYn == 1) {
+			// 텍스트로 저장되는지 테스트
+			// saveInfoTxt();
+
+			// 자동저장 쓰레드 start
+			if (!thread.isAlive()) {// 쓰레드가 살아있는지 확인
+				thread.setDaemon(true);
+				thread.start();
+				System.out.println("자동저장을 시작합니다.\n");
+			} else {
+				System.out.println("이미 자동저장이 실행중입니다.");
+			}
+		} else if (autoSaveYn == 2) {
+			// 자동저장 쓰레드 interrupt
+			if (!thread.isInterrupted()) {
+				System.out.println("자동저장을 종료했습니다.\n");
+				thread.interrupt();
+			}
+		} else {
+			System.out.println("메뉴를 잘못입력하셨습니다.");
+		}
+		return thread;
+	}
+
 	// 종료 시 lists의 계좌정보 file에 업데이트
 	public void accountListSave() {
 		try {
@@ -346,7 +382,6 @@ public class AccountManager {
 			// 리스트를 돌려서 하나씩 out객체에 담는다.
 			for (Account acc : accLists) {
 				out.writeObject(acc);
-
 			}
 			out.close();
 		} catch (IOException e) {

@@ -13,13 +13,14 @@ public class BankingSystemMain {
 		//계좌정보 불러오기(프로그램 실행시 먼저 실행)
 		accountManager.accountLoad();
 		
+		AutoSaver thread = new AutoSaver();
 		// 종료 메뉴를 누르기 전까지는 계속실행(무한루프)
 		while (true) {
 			AccountManager.showMenu();
 			Scanner scanner = new Scanner(System.in);
 			int menuNum = scanner.nextInt();
 			
-			if(menuNum<1||menuNum>6) {
+			if(menuNum<1||menuNum>7) {
 				MenuSelectException excep = new MenuSelectException();
 				throw excep;
 			}
@@ -41,8 +42,12 @@ public class BankingSystemMain {
 			case ICustomDefine.DELETE :
 				accountManager.delAccount();
 				break;
+			case ICustomDefine.AUTOSAVE :
+			 accountManager.autoSave(thread);
+				break;
 			case ICustomDefine.EXIT :
 				accountManager.accountListSave(); //저장 후 종료
+				
 				return;
 
 			}
